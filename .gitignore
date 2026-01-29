@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Virtual environments
+env/
+venv/
+
+# Data files (if you don't want to push datasets)
+*.csv
+*.xlsx
+
+# VS Code settings
+.vscode/
