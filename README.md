@@ -27,21 +27,6 @@ Risk tier classification (Low, Moderate, High)
 ### Dataset
 The project uses the Stroke Prediction Dataset originally available on Kaggle (https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset).
 
-### Repository Structure
-stroke-risk-prediction
-│
-├── EDA.ipynb
-│   Exploratory data analysis and visualization
-│
-├── model.ipynb
-│   Model training, evaluation, threshold tuning,
-│   and risk tier classification
-│
-├── stroke_model.pkl
-│   Trained logistic regression model
-│
-└── README.md
-
 ### Evaluation Metrics
 Because stroke datasets are highly imbalanced, model performance is evaluated using:
 
@@ -65,8 +50,7 @@ Predicted probabilities are mapped to three clinically meaningful risk tiers bas
 | Risk Tier | Probability Range | Monitoring | Lifestyle Guidance | Clinical Action |
 |-----------|------------------|------------|-------------------|-----------------|
 | 🟢 **Low** | Below moderate cutoff | Routine annual review | Maintain healthy diet, exercise, and avoid smoking | No immediate intervention required |
-| 🟡 **Moderate** | Moderate to high cutoff | Follow-up every 3–6 months | Address modifiable risk factors (weight, glucose, smoking) | Consider refer
-ral for risk factor management |
+| 🟡 **Moderate** | Moderate to high cutoff | Follow-up every 3–6 months | Address modifiable risk factors (weight, glucose, smoking) | Consider referral for risk factor management |
 | 🔴 **High** | Above high cutoff | Frequent monitoring | Urgent lifestyle modification advised | Prompt clinical referral recommended |
 
 ### Results
