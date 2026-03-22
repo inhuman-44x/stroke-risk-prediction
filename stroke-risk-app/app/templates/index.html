@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stroke Risk Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f4f1ec;
+      --surface: #ffffff;
+      --ink: #1a1a2e;
+      --ink-muted: #6b6b80;
+      --accent: #c0392b;
+      --border: #e0dcd4;
+      --low: #1a7a4a;
+      --low-bg: #e8f5ee;
+      --moderate: #c07a00;
+      --moderate-bg: #fff8e6;
+      --high: #c0392b;
+      --high-bg: #fdecea;
+      --radius: 12px;
+      --shadow: 0 2px 16px rgba(26,26,46,0.08);
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    header {
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 44px; height: 44px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo svg { width: 24px; height: 24px; fill: white; }
+
+    header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--ink);
+    }
+    header p { font-size: 0.85rem; color: var(--ink-muted); margin-top: 2px; }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      max-width: 720px;
+      margin: 0 auto 1.5rem;
+      padding: 2rem;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+
+    .field { display: flex; flex-direction: column; gap: 0.4rem; }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      color: var(--ink);
+      background: var(--surface);
+      transition: border-color 0.15s;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b80' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.9rem center;
+      padding-right: 2.2rem;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(192,57,43,0.08);
+    }
+
+    input::placeholder { color: #bbb; }
+
+    .hint {
+      font-size: 0.74rem;
+      color: var(--ink-muted);
+    }
+
+    .toggle-group { display: flex; }
+    .toggle-group input[type="radio"] { display: none; }
+    .toggle-group label {
+      flex: 1;
+      text-align: center;
+      padding: 0.65rem;
+      border: 1.5px solid var(--border);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--ink-muted);
+      transition: all 0.15s;
+      background: var(--surface);
+    }
+    .toggle-group label:first-of-type { border-radius: 8px 0 0 8px; }
+    .toggle-group label:last-of-type  { border-radius: 0 8px 8px 0; border-left: none; }
+    .toggle-group input[type="radio"]:checked + label {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .result-card {
+      max-width: 720px;
+      margin: 0 auto 1.5rem;
+      border-radius: var(--radius);
+      padding: 2rem;
+      border: 1.5px solid;
+      animation: slideIn 0.4s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-card.low      { background: var(--low-bg);      border-color: var(--low);      }
+    .result-card.moderate { background: var(--moderate-bg); border-color: var(--moderate); }
+    .result-card.high     { background: var(--high-bg);     border-color: var(--high);     }
+
+    .result-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+
+    .risk-badge {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.6rem;
+      line-height: 1;
+    }
+    .low      .risk-badge { color: var(--low); }
+    .moderate .risk-badge { color: var(--moderate); }
+    .high     .risk-badge { color: var(--high); }
+
+    .result-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); }
+    .result-tier  { font-size: 1.1rem; font-weight: 600; margin-top: 2px; }
+    .low      .result-tier { color: var(--low); }
+    .moderate .result-tier { color: var(--moderate); }
+    .high     .result-tier { color: var(--high); }
+
+    .result-advice {
+      font-size: 0.9rem;
+      color: var(--ink);
+      line-height: 1.6;
+      padding-top: 0.8rem;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .disclaimer {
+      max-width: 720px;
+      margin: 0 auto;
+      font-size: 0.76rem;
+      color: var(--ink-muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 540px) {
+      .grid { grid-template-columns: 1fr; }
+      .card { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Stroke Risk Predictor</h1>
+      <p>Clinical decision support — not a substitute for professional medical advice</p>
+    </div>
+  </header>
+
+  <!-- Result (shown after submission) -->
+  {% if result %}
+  <div class="result-card {{ result.risk_color }}">
+    <div class="result-header">
+      <div class="risk-badge">{{ result.probability }}%</div>
+      <div>
+        <div class="result-label">Stroke Risk Probability</div>
+        <div class="result-tier">{{ result.risk_level }} Risk</div>
+      </div>
+    </div>
+    <div class="result-advice">{{ result.advice }}</div>
+    {% if result.bmi_missing %}
+    <div class="result-advice" style="margin-top:0.6rem; font-size:0.8rem; opacity:0.75;">
+      ⚠️ BMI was not provided — the model used the missing-BMI indicator flag as trained.
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <form method="POST" action="/predict">
+
+    <!-- Demographics -->
+    <div class="card">
+      <div class="section-title">Demographics</div>
+      <div class="grid">
+
+        <div class="field">
+          <label for="age">Age (years)</label>
+          <input type="number" id="age" name="age" min="0" max="120"
+                 placeholder="e.g. 54"
+                 value="{{ form_data.age if form_data else '' }}" required/>
+        </div>
+
+        <div class="field">
+          <label>Gender</label>
+          <select name="gender" required>
+            <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
+            <option value="Male"   {% if form_data and form_data.gender == 'Male'   %}selected{% endif %}>Male</option>
+            <option value="Female" {% if form_data and form_data.gender == 'Female' %}selected{% endif %}>Female</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Ever Married?</label>
+          <select name="ever_married" required>
+            <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
+            <option value="Yes" {% if form_data and form_data.ever_married == 'Yes' %}selected{% endif %}>Yes</option>
+            <option value="No"  {% if form_data and form_data.ever_married == 'No'  %}selected{% endif %}>No</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Residence Type</label>
+          <select name="residence_type" required>
+            <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
+            <option value="Urban" {% if form_data and form_data.residence_type == 'Urban' %}selected{% endif %}>Urban</option>
+            <option value="Rural" {% if form_data and form_data.residence_type == 'Rural' %}selected{% endif %}>Rural</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Work Type</label>
+          <select name="work_type" required>
+            <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
+            <option value="Private"       {% if form_data and form_data.work_type == 'Private'       %}selected{% endif %}>Private</option>
+            <option value="Self-employed" {% if form_data and form_data.work_type == 'Self-employed' %}selected{% endif %}>Self-employed</option>
+            <option value="Government Job"      {% if form_data and form_data.work_type == 'Government Job'      %}selected{% endif %}>Government Job</option>
+            <option value="Not working"  {% if form_data and form_data.work_type == 'Not working'  %}selected{% endif %}>Not working</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Smoking Status</label>
+          <select name="smoking_status" required>
+            <option value="" disabled {% if not form_data %}selected{% endif %}>Select</option>
+            <option value="Never smoked"    {% if form_data and form_data.smoking_status == 'Never smoked'    %}selected{% endif %}>Never Smoked</option>
+            <option value="Formerly smoked" {% if form_data and form_data.smoking_status == 'Formerly smoked' %}selected{% endif %}>Formerly Smoked</option>
+            <option value="Smokes"          {% if form_data and form_data.smoking_status == 'Smokes'          %}selected{% endif %}>Smokes</option>
+            <option value="Unknown"         {% if form_data and form_data.smoking_status == 'Unknown'         %}selected{% endif %}>Unknown</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Clinical Measurements -->
+    <div class="card">
+      <div class="section-title">Clinical Measurements</div>
+      <div class="grid">
+
+        <div class="field">
+          <label for="avg_glucose_level">Avg. Glucose Level (mg/dL)</label>
+          <input type="number" id="avg_glucose_level" name="avg_glucose_level"
+                 min="0" max="500" step="0.1" placeholder="e.g. 106.1"
+                 value="{{ form_data.avg_glucose_level if form_data else '' }}" required/>
+        </div>
+
+        <div class="field">
+          <label for="bmi">BMI (kg/m²) <span style="font-weight:400; color:#bbb;">— optional</span></label>
+          <input type="number" id="bmi" name="bmi"
+                 min="0" max="100" step="0.1" placeholder="Leave blank if unknown"
+                 value="{{ form_data.bmi if form_data and form_data.bmi else '' }}"/>
+          <span class="hint">If blank → model uses missing-BMI flag automatically</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Medical History -->
+    <div class="card">
+      <div class="section-title">Medical History</div>
+      <div class="grid">
+
+        <div class="field">
+          <label>Hypertension</label>
+          <div class="toggle-group">
+            <input type="radio" name="hypertension" id="hyp_no"  value="0"
+                   {% if not form_data or form_data.hypertension == 0 %}checked{% endif %}/>
+            <label for="hyp_no">No</label>
+            <input type="radio" name="hypertension" id="hyp_yes" value="1"
+                   {% if form_data and form_data.hypertension == 1 %}checked{% endif %}/>
+            <label for="hyp_yes">Yes</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Heart Disease</label>
+          <div class="toggle-group">
+            <input type="radio" name="heart_disease" id="hd_no"  value="0"
+                   {% if not form_data or form_data.heart_disease == 0 %}checked{% endif %}/>
+            <label for="hd_no">No</label>
+            <input type="radio" name="heart_disease" id="hd_yes" value="1"
+                   {% if form_data and form_data.heart_disease == 1 %}checked{% endif %}/>
+            <label for="hd_yes">Yes</label>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <button type="submit" class="submit-btn">Calculate Stroke Risk →</button>
+      </div>
+    </div>
+
+  </form>
+
+  <p class="disclaimer">
+    ⚕️ This tool is for informational and research purposes only. It does not constitute
+    medical advice, diagnosis, or treatment. Always consult a qualified healthcare
+    professional for clinical decisions.
+  </p>
+
+</body>
+</html>
