@@ -24,6 +24,12 @@ Threshold optimization
 
 Risk tier classification (Low, Moderate, High)
 
+### Live Demo
+A web application for stroke risk prediction is available at:
+👉 [Stroke Risk Predictor](https://stroke-risk-app.onrender.com/)
+
+Enter a patient's demographic and clinical details to receive a predicted stroke risk probability and risk tier classification (Low, Moderate, or High).
+
 ### Dataset
 The project uses the Stroke Prediction Dataset originally available on Kaggle (https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset).
 
