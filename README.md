@@ -26,7 +26,7 @@ Risk tier classification (Low, Moderate, High)
 
 ### Live Demo
 A web application for stroke risk prediction is available at:
-👉 [Stroke Risk Predictor](https://stroke-risk-app.onrender.com/)
+👉 [Stroke Risk Predictor](https://inhuman44-stroke-risk-app.hf.space/)
 
 Enter a patient's demographic and clinical details to receive a predicted stroke risk probability and risk tier classification (Low, Moderate, or High).
 
